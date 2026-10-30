@@ -238,6 +238,7 @@ export default function App() {
   const t = languages[language];
   const currentQuestion = lessonQuestions[questionIndex];
   const correctCount = session.filter((item) => item.correct).length;
+  const completionBonus = correctCount === lessonQuestions.length && lessonQuestions.length > 0 ? 10 : 0;
   const accuracy = progress.totalAnswered
     ? Math.round((progress.totalCorrect / progress.totalAnswered) * 100)
     : 0;
@@ -451,7 +452,7 @@ export default function App() {
     if (transitionLock.current || page !== "lesson") return;
     transitionLock.current = true;
     const today = getDateKey();
-    const bonusXp = 10;
+    const bonusXp = completionBonus;
     const unlockedFirstLesson = progress.lessons === 0;
     const completedTopics = [...new Set(lessonQuestions.map((question) => question.topic || question.skill))];
     setProgress((old) => ({
@@ -1073,7 +1074,7 @@ export default function App() {
         {newAchievement && <div className="achievement-pop completion-achievement" role="status"><span>🏆</span><strong>{newAchievement}</strong><button onClick={() => setNewAchievement("")} aria-label={t.dismiss}>×</button></div>}
         <span className="eyebrow">{t.allCaughtUp}</span><h1>{t.lessonComplete}</h1>
         <p>{t.yourScore}: <strong>{correctCount} / {session.length}</strong></p>
-        <div className="completion-rewards"><span>✦ <strong>+{sessionXp}</strong> {t.xpEarned}</span><span>🎁 <strong>+10</strong> {t.bonus}</span></div>
+        <div className="completion-rewards"><span>✦ <strong>+{sessionXp}</strong> {t.xpEarned}</span><span>🎁 <strong>+{completionBonus}</strong> {t.bonus}</span></div>
         <div className="completion-actions">
           <button className="primary-button" onClick={() => startLesson(activeSkill)}>{t.tryAnother}<span aria-hidden="true">→</span></button>
           <button className="secondary-button" onClick={() => goTo("home")}>{t.backHome}</button>
