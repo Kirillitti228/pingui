@@ -4,12 +4,13 @@ import questionBank from "./questionBank.js";
 import { languages, skillIcons, skillKeys } from "./translations.js";
 import VocabularyPage from "./VocabularyPage.jsx";
 import Penguin from "./Penguin.jsx";
+import { getPingiMessage } from "./pingiMessages.js";
 
 const STORAGE_KEY = "pingui-learning-progress";
 const languageTags = { English: "en", Norwegian: "nb", Russian: "ru", Ukrainian: "uk" };
-const levelRank = { beginner: 0, elementary: 1, intermediate: 2, upperIntermediate: 3 };
-const levels = ["beginner", "elementary", "intermediate", "upperIntermediate"];
-const levelUnlockXp = { beginner: 0, elementary: 40, intermediate: 120, upperIntermediate: 240 };
+const levelRank = { beginner: 0, elementary: 1, intermediate: 2, upperIntermediate: 3, advanced: 4 };
+const levels = ["beginner", "elementary", "intermediate", "upperIntermediate", "advanced"];
+const levelUnlockXp = { beginner: 0, elementary: 40, intermediate: 120, upperIntermediate: 240, advanced: 500 };
 const catalog = [
   ...lessons.flatMap((lesson) => lesson.questions.map((question, index) => ({
     ...question,
@@ -427,7 +428,7 @@ export default function App() {
     });
     if (correct) setSessionXp((xp) => xp + 10);
     if ((progress.totalAnswered + 1) % 10 === 0) setCharacterState("encouraging");
-    if (levelReached < 3 && progress.xp + (correct ? 10 : 0) >= Object.values(levelUnlockXp)[levelReached + 1]) {
+    if (levelReached < levels.length - 1 && progress.xp + (correct ? 10 : 0) >= levelUnlockXp[levels[levelReached + 1]]) {
       setNewAchievement(t.newStage);
       setCharacterState("excited");
     }
@@ -905,7 +906,10 @@ export default function App() {
     const options = getOptions(question, language, t);
     const typeLabel = t.exerciseTypes[question.type] || t.exercise;
     const questionPrompt = question.promptByLanguage?.[language] || question.prompt;
-    const translationSource = question.type === "translateToEnglish" ? question.sourceByLanguage[language] : question.sourceText;
+    const translationSource = question.sourceByLanguage?.[language]
+      || (question.type === "translateToEnglish" ? question.sourceByLanguage?.English : question.sourceText);
+    const pingiMessageType = !answered ? "hint" : session[session.length - 1]?.correct ? "correct" : "retry";
+    const pingiMessage = getPingiMessage(language, pingiMessageType, questionIndex, session.length);
     const isChoiceType = [
       "choice", "translate", "translateToInterface", "translateToEnglish", "listening", "reading",
       "pronunciation", "grammarMistake", "verbForm", "conversation", "dialogue", "pictureMatch",
@@ -928,7 +932,7 @@ export default function App() {
         <div className="lesson-progress"><span style={{ width: `${answeredProgress}%` }} /></div>
         <article className={`exercise-card exercise-${question.type}`} key={question.id}>
           <div className={`exercise-pingi exercise-mood-${characterMood}`}><Penguin small state={characterMood} label={t.penguinDescription} /></div>
-          <div className="exercise-bubble"><strong>{t.pingi}</strong><p>{answered ? (session[session.length - 1]?.correct ? t.pingiCelebrate : t.tryAgain) : t.pingiHint}</p></div>
+          <div className="exercise-bubble"><strong>{t.pingi}</strong><p>{pingiMessage}</p></div>
           <span className="exercise-count">{String(questionIndex + 1).padStart(2, "0")} / {String(lessonQuestions.length).padStart(2, "0")}</span>
           <div className="exercise-label-row">
             <span className={`exercise-label exercise-label-${question.type}`}>{typeLabel}</span>
@@ -950,7 +954,7 @@ export default function App() {
           <h1>{questionPrompt}</h1>
           {translationSource && (
             <div className="translation-card">
-              <span>{question.type === "translateToEnglish" ? t.sourcePrompt : t.englishPrompt}</span>
+              <span>{question.sourceByLanguage ? t.sourcePrompt : t.englishPrompt}</span>
               <strong>{translationSource}</strong>
             </div>
           )}

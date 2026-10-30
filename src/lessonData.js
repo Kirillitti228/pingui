@@ -158,7 +158,18 @@ export const lessons = [
     questions: [
       {
         type: "writing",
-        prompt: 'Write the English sentence: "I usually walk to work."',
+        promptByLanguage: {
+          English: "Rewrite this idea in natural English:",
+          Norwegian: "Oversett denne setningen til engelsk:",
+          Russian: "Переведи это предложение на английский:",
+          Ukrainian: "Переклади це речення англійською:",
+        },
+        sourceByLanguage: {
+          English: "I go to my job on foot on most days.",
+          Norwegian: "Jeg går vanligvis til jobben.",
+          Russian: "Я обычно хожу на работу пешком.",
+          Ukrainian: "Я зазвичай ходжу на роботу пішки.",
+        },
         answer: "I usually walk to work",
         explanation: 'A natural sentence is "I usually walk to work."',
       },
@@ -171,7 +182,18 @@ export const lessons = [
       },
       {
         type: "writing",
-        prompt: 'Write the English sentence: "My sister is learning to cook."',
+        promptByLanguage: {
+          English: "Rewrite this idea in natural English:",
+          Norwegian: "Oversett denne setningen til engelsk:",
+          Russian: "Переведи это предложение на английский:",
+          Ukrainian: "Переклади це речення англійською:",
+        },
+        sourceByLanguage: {
+          English: "My sister is learning how to prepare food.",
+          Norwegian: "Søstera mi lærer å lage mat.",
+          Russian: "Моя сестра учится готовить.",
+          Ukrainian: "Моя сестра вчиться готувати.",
+        },
         answer: "My sister is learning to cook",
         explanation: 'A natural sentence is "My sister is learning to cook."',
       },
