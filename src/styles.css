@@ -1037,6 +1037,73 @@ body {
 @keyframes penguin-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
 .pingui-motion-off *, .pingui-motion-off *::before, .pingui-motion-off *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eff1ff;
+  --muted: #b3bad2;
+  --line: #414761;
+  --purple: #aaa0ff;
+  --purple-dark: #c2bbff;
+  --purple-pale: #34304e;
+  --shadow: 0 16px 42px rgb(0 0 0 / 24%);
+}
+html[data-theme="dark"] body { background: radial-gradient(ellipse at 88% 5%, rgb(66 79 119 / 38%), transparent 31rem), linear-gradient(145deg, #171a27, #1d2030 65%, #191d2b); color: var(--ink); }
+html[data-theme="dark"] .sidebar { background: rgb(28 31 46 / 95%); border-color: var(--line); }
+html[data-theme="dark"] .hero-card,
+html[data-theme="dark"] .vocabulary-overview { background: linear-gradient(112deg, #302d49, #292f46 54%, #263a4b); border-color: #464766; }
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .goal-card,
+html[data-theme="dark"] .level-card,
+html[data-theme="dark"] .recommend-card,
+html[data-theme="dark"] .badges-card,
+html[data-theme="dark"] .chart-card,
+html[data-theme="dark"] .skill-progress-card,
+html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .profile-badges,
+html[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .storage-card,
+html[data-theme="dark"] .reset-card,
+html[data-theme="dark"] .exercise-card,
+html[data-theme="dark"] .learning-stage-content,
+html[data-theme="dark"] .learning-topic-card,
+html[data-theme="dark"] .word-card,
+html[data-theme="dark"] .achievement-card,
+html[data-theme="dark"] .reading-passage,
+html[data-theme="dark"] .dialogue-card,
+html[data-theme="dark"] .statement-card,
+html[data-theme="dark"] .translation-card,
+html[data-theme="dark"] .arrange-area,
+html[data-theme="dark"] .vocabulary-empty { background-color: #24283a; color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] .setting-row { border-color: var(--line); }
+html[data-theme="dark"] .setting-row strong,
+html[data-theme="dark"] .exercise-card h1,
+html[data-theme="dark"] .page-heading h1,
+html[data-theme="dark"] .page-heading h2,
+html[data-theme="dark"] .learning-stage-heading h3,
+html[data-theme="dark"] .vocabulary-overview-copy h2 { color: var(--ink); }
+html[data-theme="dark"] .setting-row select,
+html[data-theme="dark"] .fixed-language,
+html[data-theme="dark"] .answer-input-wrap input,
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .vocabulary-search,
+html[data-theme="dark"] .vocabulary-topic,
+html[data-theme="dark"] .collection-filter,
+html[data-theme="dark"] .path-xp,
+html[data-theme="dark"] .answer-option,
+html[data-theme="dark"] .match-option { background-color: #1c2030; color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] .answer-option.selected { background: #383451; border-color: #8d82eb; }
+html[data-theme="dark"] .exercise-bubble,
+html[data-theme="dark"] .speech-bubble { background: #302d49; border-color: #4a456c; color: var(--ink); }
+html[data-theme="dark"] .learning-topic-card:hover:not(:disabled) { background: #302d49; }
+html[data-theme="dark"] .flashcard-dialog,
+html[data-theme="dark"] .confirm-modal,
+html[data-theme="dark"] .flashcard { background: #24283a; color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] .sidebar .nav-item { color: var(--muted); }
+html[data-theme="dark"] .sidebar .nav-item.active { background: #302d49; color: var(--purple-dark); }
+html[data-theme="dark"] .primary-button { color: #fff; }
+html[data-theme="dark"] .vocabulary-mascot { background: #30354b; border-color: #454b64; }
+
 @media (max-width: 760px) {
   .learning-topic-grid { grid-template-columns: 1fr; }
   .learning-stage { grid-template-columns: 30px minmax(0, 1fr); gap: 8px; }

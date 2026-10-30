@@ -28,7 +28,7 @@ const questionBank = [
   },
   {
     id: "family-translate-interface-01", skill: "vocabulary", level: "beginner", topic: "family", type: "translateToInterface",
-    prompt: "Choose the meaning of this English word.", sourceText: "sister",
+    promptByLanguage: { English: "Choose the English meaning of this word.", Norwegian: "Hva betyr dette engelske ordet? Velg den engelske forklaringen.", Russian: "Выберите английское объяснение этого слова.", Ukrainian: "Оберіть англійське пояснення цього слова." }, sourceText: "sister",
     translations: { English: "a female sibling", Norwegian: "søster", Russian: "сестра", Ukrainian: "сестра" },
     optionsByLanguage: {
       English: ["a female sibling", "a parent's brother", "a close friend"],
@@ -41,7 +41,7 @@ const questionBank = [
   },
   {
     id: "weather-translate-interface-01", skill: "vocabulary", level: "elementary", topic: "weather", type: "translateToInterface",
-    prompt: "Choose the meaning of this English word.", sourceText: "cloudy",
+    promptByLanguage: { English: "Choose the English meaning of this word.", Norwegian: "Hva betyr dette engelske ordet? Velg den engelske forklaringen.", Russian: "Выберите английское объяснение этого слова.", Ukrainian: "Оберіть англійське пояснення цього слова." }, sourceText: "cloudy",
     translations: { English: "covered with clouds", Norwegian: "skyet", Russian: "облачно", Ukrainian: "хмарно" },
     optionsByLanguage: {
       English: ["covered with clouds", "full of sunshine", "very windy"],
@@ -319,7 +319,7 @@ const questionBank = [
   },
   {
     id: "translate-to-interface-shopping-01", skill: "vocabulary", level: "intermediate", topic: "shopping", type: "translateToInterface",
-    prompt: "Choose the meaning of this English phrase.", sourceText: "on sale",
+    promptByLanguage: { English: "Choose the English meaning of this phrase.", Norwegian: "Hva betyr dette engelske uttrykket? Velg den engelske forklaringen.", Russian: "Выберите английское объяснение этой фразы.", Ukrainian: "Оберіть англійське пояснення цього вислову." }, sourceText: "on sale",
     translations: { English: "available at a lower price", Norwegian: "på salg", Russian: "со скидкой", Ukrainian: "зі знижкою" },
     optionsByLanguage: {
       English: ["available at a lower price", "out of stock", "made by hand"],

@@ -129,8 +129,8 @@ const messages = {
   },
 };
 
-export function getPingiMessage(language, type, questionIndex, answerCount) {
-  const pool = (messages[language] || messages.English)[type];
-  const index = (questionIndex * 5 + answerCount * 2) % pool.length;
-  return pool[index];
+export function getPingiMessage(language, type, previousMessage = "") {
+  const pool = (messages[language] || messages.English)[type] || messages.English.hint;
+  const choices = pool.filter((message) => message !== previousMessage);
+  return choices[Math.floor(Math.random() * choices.length)] || pool[0];
 }

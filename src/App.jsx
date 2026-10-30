@@ -87,6 +87,7 @@ function readSavedState() {
         : highestUnlockedLevel,
       soundsEnabled: typeof parsed.soundsEnabled === "boolean" ? parsed.soundsEnabled : false,
       animationsEnabled: typeof parsed.animationsEnabled === "boolean" ? parsed.animationsEnabled : true,
+      theme: parsed.theme === "dark" ? "dark" : "light",
       savedWords: Array.isArray(parsed.savedWords) ? parsed.savedWords.filter((word) => typeof word === "string") : [],
       learnedWords: Array.isArray(parsed.learnedWords) ? parsed.learnedWords.filter((word) => typeof word === "string") : [],
       progress: {
@@ -153,10 +154,10 @@ function chooseLessonQuestions(skillId, level, progress, reviewOnly = false, top
 
 function getOptions(question, language, t) {
   if (question.type === "translateToInterface") {
-    return question.optionsByLanguage[language].map((value) => ({
+    return question.optionsByLanguage.English.map((value) => ({
       value,
       label: value,
-      correct: value === question.answerByLanguage[language],
+      correct: value === question.answerByLanguage.English,
     }));
   }
   if (question.type === "trueFalse") {
@@ -205,6 +206,9 @@ export default function App() {
   const [learningLevel, setLearningLevel] = useState(initialState.learningLevel || "beginner");
   const [soundsEnabled, setSoundsEnabled] = useState(initialState.soundsEnabled || false);
   const [animationsEnabled, setAnimationsEnabled] = useState(initialState.animationsEnabled ?? true);
+  const [theme, setTheme] = useState(initialState.theme || "light");
+  const [pingiMessage, setPingiMessage] = useState(() => getPingiMessage(initialState.language || "English", "hint"));
+  const lastPingiMessage = useRef(pingiMessage);
   const [progress, setProgress] = useState(initialState.progress || emptyProgress);
   const [savedWords, setSavedWords] = useState(initialState.savedWords || []);
   const [learnedWords, setLearnedWords] = useState(initialState.learnedWords || []);
@@ -249,13 +253,22 @@ export default function App() {
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ language, name, dailyGoal, learningLevel, soundsEnabled, animationsEnabled, progress, savedWords, learnedWords }),
+        JSON.stringify({ language, name, dailyGoal, learningLevel, soundsEnabled, animationsEnabled, theme, progress, savedWords, learnedWords }),
       );
       setStorageError(false);
     } catch {
       setStorageError(true);
     }
-  }, [language, name, dailyGoal, learningLevel, soundsEnabled, animationsEnabled, progress, savedWords, learnedWords]);
+  }, [language, name, dailyGoal, learningLevel, soundsEnabled, animationsEnabled, theme, progress, savedWords, learnedWords]);
+
+  useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+
+  useEffect(() => {
+    const messageType = page !== "lesson" || !answered ? "hint" : session[session.length - 1]?.correct ? "correct" : "retry";
+    const message = getPingiMessage(language, messageType, lastPingiMessage.current);
+    lastPingiMessage.current = message;
+    setPingiMessage(message);
+  }, [language, page, questionIndex, answered, session]);
 
   useEffect(() => {
     document.documentElement.lang = languageTags[language];
@@ -367,7 +380,7 @@ export default function App() {
     if (!hasResponse) return;
 
     const correctAnswer = currentQuestion.type === "translateToInterface"
-      ? currentQuestion.answerByLanguage[language]
+      ? currentQuestion.answerByLanguage.English
       : currentQuestion.answer;
     const correct = isMatch
       ? currentQuestion.pairs.every((pair) => matches[pair.word] === pair.meaning)
@@ -587,7 +600,7 @@ export default function App() {
             <button className="primary-button" onClick={() => startLesson("vocabulary")}>
               {progress.lessons ? t.continueLearning : t.startLearning}<span aria-hidden="true">→</span>
             </button>
-            <div className="hero-note">✦ {t.pingiHint}</div>
+            <div className="hero-note">✦ {pingiMessage}</div>
           </div>
           <div className="hero-art">
             <div className="hero-orbit orbit-one" />
@@ -849,6 +862,11 @@ export default function App() {
               {Object.keys(languages).map((languageName) => <option key={languageName} value={languageName}>{languageName}</option>)}
             </select>
           </label>
+          <label className="setting-row" htmlFor="theme-select"><span><strong>{t.themeLabel}</strong><small>{t.themeDescription}</small></span>
+            <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
+              <option value="light">{t.lightTheme}</option><option value="dark">{t.darkTheme}</option>
+            </select>
+          </label>
           <div className="setting-row"><span><strong>{t.learningLanguage}</strong><small>{t.englishLearning}</small></span><span className="fixed-language">🇬🇧 English</span></div>
           <label className="setting-row" htmlFor="daily-goal"><span><strong>{t.goalSettings}</strong><small>{t.goalHint}</small></span>
             <select id="daily-goal" value={dailyGoal} onChange={(event) => setDailyGoal(Number(event.target.value))}>
@@ -888,7 +906,7 @@ export default function App() {
 
   function correctAnswerText(question) {
     if (question.type === "match") return question.pairs.map((pair) => `${pair.word} — ${pair.meaning}`).join(", ");
-    if (question.type === "translateToInterface") return question.answerByLanguage[language];
+    if (question.type === "translateToInterface") return question.answerByLanguage.English;
     if (question.type === "trueFalse") return question.answer === "true" ? t.true : t.false;
     return question.correction || question.answer;
   }
@@ -908,8 +926,6 @@ export default function App() {
     const questionPrompt = question.promptByLanguage?.[language] || question.prompt;
     const translationSource = question.sourceByLanguage?.[language]
       || (question.type === "translateToEnglish" ? question.sourceByLanguage?.English : question.sourceText);
-    const pingiMessageType = !answered ? "hint" : session[session.length - 1]?.correct ? "correct" : "retry";
-    const pingiMessage = getPingiMessage(language, pingiMessageType, questionIndex, session.length);
     const isChoiceType = [
       "choice", "translate", "translateToInterface", "translateToEnglish", "listening", "reading",
       "pronunciation", "grammarMistake", "verbForm", "conversation", "dialogue", "pictureMatch",
@@ -966,13 +982,13 @@ export default function App() {
                 if (question.type === "pictureWord") className += " picture-answer";
                 if (question.type === "trueFalse") className += option.value === "true" ? " true-option" : " false-option";
                 if (selected === option.value) className += " selected";
-                if (answered && option.value === (question.type === "translateToInterface" ? question.answerByLanguage[language] : question.answer)) className += " answer-correct";
-                if (answered && selected === option.value && option.value !== (question.type === "translateToInterface" ? question.answerByLanguage[language] : question.answer)) className += " answer-wrong";
+                if (answered && option.value === (question.type === "translateToInterface" ? question.answerByLanguage.English : question.answer)) className += " answer-correct";
+                if (answered && selected === option.value && option.value !== (question.type === "translateToInterface" ? question.answerByLanguage.English : question.answer)) className += " answer-wrong";
                 return (
                   <button key={option.value} className={className} onClick={() => !answered && setSelected(option.value)} disabled={answered} aria-pressed={selected === option.value}>
                     {question.type !== "trueFalse" && <span className="option-letter">{String.fromCharCode(65 + index)}</span>}<span>{option.label}</span>
-                    {answered && option.value === (question.type === "translateToInterface" ? question.answerByLanguage[language] : question.answer) && <b>✓</b>}
-                    {answered && selected === option.value && option.value !== (question.type === "translateToInterface" ? question.answerByLanguage[language] : question.answer) && <b>×</b>}
+                    {answered && option.value === (question.type === "translateToInterface" ? question.answerByLanguage.English : question.answer) && <b>✓</b>}
+                    {answered && selected === option.value && option.value !== (question.type === "translateToInterface" ? question.answerByLanguage.English : question.answer) && <b>×</b>}
                   </button>
                 );
               })}
@@ -1093,7 +1109,7 @@ export default function App() {
         </nav>
         <div className="sidebar-bottom">
           <div className="mini-pingi"><Penguin small state="encouraging" label={t.penguinDescription} /></div>
-          <strong>{t.pingi}</strong><p>{t.pingiHint}</p>
+          <strong>{t.pingi}</strong><p>{pingiMessage}</p>
           <div className="sidebar-level"><span>{t.level} {level}</span><span>{progress.xp} XP</span></div>
           <div className="tiny-progress"><span style={{ width: `${levelProgress}%` }} /></div>
           <button className="sidebar-profile" onClick={() => goTo("profile")}>{name}<span aria-hidden="true">→</span></button>
