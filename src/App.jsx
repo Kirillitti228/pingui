@@ -397,7 +397,6 @@ export default function App() {
     const updatedMissed = correct
       ? (progress.missedQuestions || []).filter((id) => id !== currentQuestion.id)
       : [...new Set([...(progress.missedQuestions || []), currentQuestion.id])];
-    const levelReached = levelRank[learningLevel];
     const earnedBadge = correct && !getAchievements(progress).find((badge) => badge.id === "perfectLesson")?.unlocked
       && progress.totalCorrect + 1 >= 5
       ? t.brilliantEffort
@@ -442,10 +441,6 @@ export default function App() {
     });
     if (correct) setSessionXp((xp) => xp + 10);
     if ((progress.totalAnswered + 1) % 10 === 0) setCharacterState("encouraging");
-    if (levelReached < levels.length - 1 && progress.xp + (correct ? 10 : 0) >= levelUnlockXp[levels[levelReached + 1]]) {
-      setNewAchievement(t.newStage);
-      setCharacterState("excited");
-    }
   }
 
   function completeLesson() {
@@ -455,6 +450,7 @@ export default function App() {
     const bonusXp = completionBonus;
     const unlockedFirstLesson = progress.lessons === 0;
     const completedTopics = [...new Set(lessonQuestions.map((question) => question.topic || question.skill))];
+    const finishedNewTopic = completedTopics.some((topic) => !(progress.completedTopics || []).includes(topic));
     setProgress((old) => ({
       ...old,
       xp: old.xp + bonusXp,
@@ -472,6 +468,9 @@ export default function App() {
     }));
     if (unlockedFirstLesson) {
       setNewAchievement(t.firstLesson);
+      playSound("achievement");
+    } else if (finishedNewTopic) {
+      setNewAchievement(t.newStage);
       playSound("achievement");
     }
     setCharacterState(unlockedFirstLesson || correctCount === lessonQuestions.length ? "dancing" : "excited");
